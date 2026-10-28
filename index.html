@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Пиратский клад</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@600;800;900&family=Nunito:wght@700;800;900&display=swap">
+<style>
+/* Layout: сверху морская сцена (корабль слева, цель справа), под ней задание и цифровая клавиатура. Одна «морская» тема. */
+:root{
+  --deep:#062a3a; --sea1:#0b5d73; --sea2:#0a4257; --sand:#f3d9a1; --wood:#7a4a22; --wood2:#4a2a10;
+  --panel:#0e3b4f; --line:rgba(160,220,235,.22); --fg:#f1fbff; --muted:#a6cfdc;
+  --gold:#ffcb3d; --gold2:#d98c0a; --ok:#5fe3a1; --bad:#ff6b6b; --kraken:#8b4fc9;
+  --f-display:"Rubik","Nunito",system-ui,sans-serif; --f-body:"Nunito",system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;min-height:100%}
+body{background:linear-gradient(#0a3d52,var(--deep) 70%);color:var(--fg);font:17px/1.4 var(--f-body);overflow-x:hidden;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+#fx{position:fixed;inset:0;z-index:30;pointer-events:none}
+.wrap{max-width:980px;margin:0 auto;padding-block:14px 30px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.logo{font:900 28px/1 var(--f-display);letter-spacing:.01em;display:flex;align-items:center;gap:10px;text-shadow:0 3px 0 #02151d}
+.logo .skull{font-size:30px}
+.hud{display:flex;gap:8px;align-items:center}
+.pill{display:flex;align-items:center;gap:6px;font:900 20px var(--f-display);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px 12px;font-variant-numeric:tabular-nums}
+.pill.coins{color:var(--gold)}
+.pill.bump{animation:bump .4s}
+@keyframes bump{40%{transform:scale(1.18)}}
+.icon-btn{font:900 18px var(--f-body);background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:14px;min-width:44px;min-height:44px;cursor:pointer}
+.levels{display:flex;flex-wrap:wrap;gap:8px}
+.lv{font:800 14px var(--f-body);color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:0 14px;min-height:40px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.lv b{font:900 13px var(--f-display);opacity:.6;color:var(--fg)}
+.lv[aria-current="true"]{background:linear-gradient(#ffd866,#f0a821);color:#2a1a05;border-color:#ffe08a;box-shadow:0 4px 0 #9b5f08}
+.lv[aria-current="true"] b{color:#2a1a05;opacity:1}
+.lv .stars{color:var(--gold);letter-spacing:-1px}
+.lv[aria-current="true"] .stars{color:#7a4705}
+
+.scene{position:relative;border-radius:22px;overflow:hidden;border:3px solid #031c26;box-shadow:0 20px 50px rgba(0,0,0,.4);background:linear-gradient(#7fd3e6,#bfeaf2 55%,#9fdbe8)}
+.scene svg{display:block;width:100%;height:auto}
+.wave{animation:wave 4s ease-in-out infinite}
+.wave.w2{animation-duration:5.5s;animation-direction:reverse}
+@keyframes wave{50%{transform:translateX(-30px)}}
+.bob{animation:bob 3s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes bob{50%{transform:translateY(-6px) rotate(-1.5deg)}}
+.bob2{animation:bob 3.6s ease-in-out infinite reverse;transform-box:fill-box;transform-origin:50% 100%}
+.hit{animation:hit .5s}
+@keyframes hit{20%{transform:translateX(10px) rotate(4deg)}50%{transform:translateX(-8px) rotate(-3deg)}}
+.hpbar{position:absolute;right:14px;top:12px;width:min(260px,45%);background:rgba(0,0,0,.45);border-radius:12px;padding:6px 8px;display:flex;flex-direction:column;gap:4px}
+.hpbar span{font:900 12px var(--f-body);letter-spacing:.1em;text-transform:uppercase}
+.hpbar .bar{height:10px;border-radius:9px;background:rgba(255,255,255,.18);overflow:hidden}
+.hpbar .bar i{display:block;height:100%;background:linear-gradient(90deg,#c26cff,#7b3fd1);transition:width .4s}
+.hearts{position:absolute;left:14px;top:12px;font-size:22px;letter-spacing:2px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.4))}
+
+.play{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:760px){.play{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.prog{display:flex;gap:5px}
+.prog i{flex:1;height:8px;border-radius:9px;background:rgba(255,255,255,.12)}
+.prog i.on{background:linear-gradient(90deg,#ffd866,#f0a821)}
+.prog i.cur{background:rgba(255,203,61,.45)}
+.tag{font:900 12px var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.q{font:900 clamp(32px,6vw,46px)/1.1 var(--f-display);margin:0}
+.q.text{font:800 clamp(18px,3.2vw,22px)/1.4 var(--f-body)}
+.check{font:800 15px var(--f-body);color:var(--ok);background:rgba(95,227,161,.12);border-radius:10px;padding:6px 10px;width:max-content;max-width:100%}
+.answer{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.screen{min-width:150px;min-height:58px;padding:0 16px;border-radius:14px;background:#04202c;border:2px solid #2b6f86;font:900 36px/58px var(--f-display);text-align:right;font-variant-numeric:tabular-nums;color:var(--gold)}
+.screen.empty{color:rgba(255,255,255,.25)}
+.screen.shake{animation:shake .4s;border-color:var(--bad)}
+@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.msg{min-height:28px;font:900 18px var(--f-body)}
+.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.hint{background:#13506a;border:1px solid #2f86a3;border-radius:14px;padding:10px 12px;font-weight:800}
+.hint::before{content:"🗺 "}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.btn{font:900 16px var(--f-body);background:rgba(255,255,255,.07);color:var(--fg);border:1px solid var(--line);border-radius:14px;padding:0 18px;min-height:46px;cursor:pointer}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.main{background:linear-gradient(#ffd866,#f0a821);color:#2a1a05;border-color:#ffe08a;box-shadow:0 5px 0 #9b5f08}
+.btn.main:active{transform:translateY(3px);box-shadow:0 2px 0 #9b5f08}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.key{font:900 26px var(--f-display);min-height:60px;border-radius:14px;border:0;cursor:pointer;color:#2b1a08;background:linear-gradient(#fbe7bb,#e7c27c);box-shadow:0 5px 0 #a47a35;transition:transform .06s}
+.key:active,.key.press{transform:translateY(4px);box-shadow:0 1px 0 #a47a35}
+.key.del{background:linear-gradient(#e9d3d0,#c9a7a2);box-shadow:0 5px 0 #8b6b66}
+.key.fire{background:linear-gradient(#ff8a5c,#e2451f);color:#fff;box-shadow:0 5px 0 #8d2509;font-size:20px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+.overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:rgba(2,16,24,.72);backdrop-filter:blur(6px)}
+.modal{width:min(460px,100%);background:linear-gradient(160deg,#145a73,#0b3446);border:1px solid #3a9bb8;border-radius:26px;padding:26px 22px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center;box-shadow:0 30px 80px rgba(0,0,0,.6);animation:rise .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes rise{from{transform:translateY(30px) scale(.9);opacity:0}}
+.modal h2{font:900 32px/1.1 var(--f-display);margin:0}
+.modal p{margin:0;color:var(--muted)}
+.modal .big{font-size:64px;line-height:1}
+.bigstars{font-size:52px;letter-spacing:4px;color:var(--gold);text-shadow:0 4px 0 #8a5300}
+.bigstars .off{color:rgba(255,255,255,.18);text-shadow:none}
+details{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 16px}
+summary{cursor:pointer;font-weight:900;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:15px;margin-top:8px}
+th,td{text-align:left;padding:7px 6px;border-top:1px solid var(--line)}
+th{color:var(--muted);font-size:13px;border-top:0}
+.st-ok{color:var(--ok)}.st-mid{color:var(--gold)}.st-bad{color:var(--bad)}
+.how{color:var(--muted);font-size:14px;margin:0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div class="wrap">
+  <header>
+    <div class="logo"><span class="skull" aria-hidden="true">🏴‍☠️</span>Пиратский клад</div>
+    <div class="hud">
+      <button class="icon-btn" id="mute" type="button" aria-label="Выключить звук">🔊</button>
+      <div class="pill coins" id="coinsPill" aria-live="polite">🪙 <span id="coins">0</span></div>
+    </div>
+  </header>
+  <nav class="levels" id="levels" aria-label="Моря"></nav>
+
+  <div class="scene" id="scene">
+    <svg viewBox="0 0 800 300" id="sceneSvg" aria-hidden="true">
+      <defs>
+        <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b8aa6"/><stop offset="1" stop-color="#0a4257"/></linearGradient>
+        <linearGradient id="sail" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff8e8"/><stop offset="1" stop-color="#e8d6b0"/></linearGradient>
+        <radialGradient id="sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6c8"/><stop offset="1" stop-color="#ffd45c"/></radialGradient>
+        <linearGradient id="chestG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5652c"/><stop offset="1" stop-color="#5b3412"/></linearGradient>
+      </defs>
+      <circle cx="660" cy="62" r="34" fill="url(#sun)"/>
+      <g fill="#fff" opacity=".85"><ellipse cx="180" cy="55" rx="46" ry="14"/><ellipse cx="215" cy="46" rx="30" ry="14"/><ellipse cx="470" cy="80" rx="38" ry="11"/><ellipse cx="500" cy="72" rx="24" ry="11"/></g>
+      <!-- остров с целью -->
+      <g id="island"><ellipse cx="640" cy="222" rx="120" ry="24" fill="#e9c98a"/><path d="M600 214 C602 170 610 150 630 128" stroke="#7a4a22" stroke-width="7" fill="none"/><g fill="#2f9b55"><path d="M630 128 c-30 -6 -50 4 -60 16 c18 -6 36 -6 60 -16z"/><path d="M630 128 c10 -24 30 -32 52 -30 c-18 8 -34 18 -52 30z"/><path d="M630 128 c26 -2 44 10 50 24 c-16 -10 -32 -16 -50 -24z"/><path d="M630 128 c-14 -20 -36 -26 -56 -20 c20 4 38 10 56 20z"/></g></g>
+      <g id="target"></g>
+      <rect y="210" width="800" height="90" fill="url(#sea)"/>
+      <path class="wave" d="M-40 214 q20 -10 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 v90 h-920z" fill="#1f97b4" opacity=".7"/>
+      <!-- корабль -->
+      <g id="ship" class="bob">
+        <path d="M70 200 L250 200 L232 238 Q160 250 92 238 Z" fill="#7a4a22" stroke="#3b210b" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M80 214 L242 214" stroke="#a8692f" stroke-width="5"/>
+        <circle cx="120" cy="224" r="5" fill="#2a1606"/><circle cx="160" cy="226" r="5" fill="#2a1606"/><circle cx="200" cy="224" r="5" fill="#2a1606"/>
+        <rect x="248" y="206" width="26" height="9" rx="3" fill="#2b2b2b" transform="rotate(-12 248 210)"/>
+        <rect x="156" y="70" width="7" height="132" fill="#4a2a10"/>
+        <path d="M163 82 Q215 110 163 160 Z" fill="url(#sail)" stroke="#bfa56f" stroke-width="2"/>
+        <path d="M156 92 Q108 124 156 168 Z" fill="url(#sail)" stroke="#bfa56f" stroke-width="2"/>
+        <path d="M163 70 L195 78 L163 88 Z" fill="#1d1d1d"/><text x="171" y="84" font-size="9" fill="#fff">☠</text>
+      </g>
+      <path class="wave w2" d="M-40 236 q25 -9 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 v70 h-930z" fill="#0d6c86" opacity=".85"/>
+      <g id="balls"></g>
+    </svg>
+    <div class="hearts" id="hearts" hidden></div>
+    <div class="hpbar" id="hp" hidden><span>Кракен</span><div class="bar"><i id="hpFill" style="width:100%"></i></div></div>
+  </div>
+
+  <div class="play">
+    <section class="card" id="card" aria-live="polite"></section>
+    <section class="card">
+      <div class="answer"><div class="screen empty" id="screen" aria-live="polite">?</div><button class="btn" id="hintBtn" type="button">Подсказка</button></div>
+      <div class="pad" id="pad"></div>
+      <p class="how">Можно печатать с клавиатуры и нажимать Enter.</p>
+    </section>
+  </div>
+
+  <details><summary>Для учителя: как решал</summary><div id="report"></div></details>
+</div>
+
+<div class="overlay" id="start">
+  <div class="modal">
+    <div class="big" aria-hidden="true">🏴‍☠️</div>
+    <h2>Пиратский клад</h2>
+    <p>Считай и стреляй из пушки! Правильный ответ попадает в сундук, и монеты твои. В последнем море тебя ждёт кракен.</p>
+    <button class="btn main" id="playBtn" type="button">Поднять паруса!</button>
+  </div>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pickOne=a=>a[Math.floor(Math.random()*a.length)];
+
+// подсказки: разложить по разрядам, как на уроке
+function mulHint(a,b){if(a<10)return a+' · '+b+': вспомни таблицу или сложи '+b+' раз по '+a+'.';const parts=String(a).split('').map((d,i,s)=>+d*10**(s.length-1-i)).filter(Boolean);return a+' · '+b+' = '+parts.map(p=>p+' · '+b).join(' + ')+' = '+parts.map(p=>p*b).join(' + ')+'.'}
+function divHint(n,d){const big=Math.floor(n/(10*d))*10*d;if(!big||big===n)return 'Какое число умножить на '+d+', чтобы получилось '+n+'?';return n+' = '+big+' + '+(n-big)+'. Подели каждую часть на '+d+': '+big+' : '+d+' = '+big/d+', '+(n-big)+' : '+d+' = '+(n-big)/d+'.'}
+
+const GEN={
+ table(){const a=pickOne([3,6,9,4,5,2,3,6,9]),b=R(2,10);return Math.random()<.65?{q:a+' · '+b,a:a*b,hint:mulHint(a,b),kind:'Таблица'}:{q:a*b+' : '+a,a:b,hint:'Какое число умножить на '+a+', чтобы получилось '+a*b+'?',kind:'Таблица'}},
+ mul(){if(Math.random()<.6){const a=R(12,48),b=R(2,5);return {q:a+' · '+b,a:a*b,hint:mulHint(a,b),kind:'Умножение'}}const a=R(102,248),b=R(2,3);return {q:a+' · '+b,a:a*b,hint:mulHint(a,b),kind:'Умножение'}},
+ div(){let q,d;if(Math.random()<.6){d=R(2,5);q=R(11,Math.floor(99/d))}else{d=R(2,4);q=R(26,Math.floor(399/d))}const n=q*d;return {q:n+' : '+d,a:q,hint:divHint(n,d),check:[q,d,n],kind:'Деление'}},
+ story(){const t=pickOne([
+   ()=>{const n=R(2,4),p=R(12,35),c=R(8,25);return {t:'Пират купил '+n+' подзорные трубы по '+p+' ₪ и компас за '+c+' ₪. Сколько он заплатил?',a:n*p+c,hint:'Сначала посчитай трубы: '+n+' · '+p+'. Потом прибавь компас.'}},
+   ()=>{const n=R(3,5),p=R(13,28),s=R(10,30);return {t:'В '+n+' сундуках по '+p+' монет. Пират потратил '+s+'. Сколько монет осталось?',a:n*p-s,hint:'Сначала все монеты: '+n+' · '+p+'. Потом вычти '+s+'.'}},
+   ()=>{const k=R(3,4),each=R(12,24),g=R(2,6);return {t:k*each+' монет разделили поровну между '+k+' пиратами. Один отдал попугаю '+g+'. Сколько у него осталось?',a:each-g,hint:'Сначала узнай долю одного: '+k*each+' : '+k+'. Потом вычти '+g+'.'}},
+   ()=>{const p=R(25,45),money=R(100,150);return {t:'У капитана '+money+' ₪. Он купил 2 каната по '+p+' ₪. Сколько денег осталось?',a:money-2*p,hint:'Два каната: 2 · '+p+'. Потом вычти из '+money+'.'}},
+   ()=>{const d=R(2,4),g=R(11,16),b=R(3,9);return {t:'На корабле '+d+' палубы, на каждой по '+g+' пушек. '+b+' пушек сломались. Сколько пушек стреляет?',a:d*g-b,hint:'Сначала все пушки: '+d+' · '+g+'. Потом вычти сломанные.'}}
+  ])();t.kind='Задачи';return t},
+ boss(){return pickOne([GEN.table,GEN.mul,GEN.div,GEN.story,GEN.mul,GEN.div])()}
+};
+const LEVELS=[
+ {name:'Таблица',sea:'Море 1 · таблица на 3, 6, 9',gen:'table',n:8,target:'chest'},
+ {name:'Умножение',sea:'Море 2 · умножаем на однозначное',gen:'mul',n:6,target:'chest'},
+ {name:'Деление',sea:'Море 3 · делим клад поровну',gen:'div',n:6,target:'chest'},
+ {name:'Задачи',sea:'Море 4 · задачи в два действия',gen:'story',n:5,target:'chest'},
+ {name:'Кракен',sea:'Море 5 · бой с кракеном',gen:'boss',n:10,target:'kraken'}
+];
+
+let lv=0,ti=0,task=null,stage='main',input='',coins=0,hintShown=false,busy=false,hearts=3,bossHp=10;
+const log=LEVELS.map(()=>[]); // {kind,q,a,first,hint}
+let cur=null;
+
+// цель на острове
+function drawTarget(){const g=$('target');const isK=LEVELS[lv].target==='kraken';$('island').style.display=isK?'none':'';
+  g.innerHTML=isK?
+  `<g class="bob2" id="tgt"><path d="M560 230 q-30 -40 -10 -80 q20 -40 70 -40 q50 0 70 40 q20 40 -10 80 z" fill="#8b4fc9" stroke="#4b2178" stroke-width="5"/>
+   <circle cx="600" cy="170" r="16" fill="#fff"/><circle cx="660" cy="170" r="16" fill="#fff"/><circle cx="604" cy="174" r="8" fill="#1a0b2b"/><circle cx="656" cy="174" r="8" fill="#1a0b2b"/>
+   <path d="M610 205 q20 12 40 0" stroke="#4b2178" stroke-width="5" fill="none" stroke-linecap="round"/>
+   <g fill="#9d60dc" stroke="#4b2178" stroke-width="4"><path d="M540 236 q-40 -10 -60 -50 q30 30 66 34z"/><path d="M720 236 q40 -10 60 -50 q-30 30 -66 34z"/><path d="M575 240 q-20 30 -60 30 q40 -14 50 -34z"/><path d="M685 240 q20 30 60 30 q-40 -14 -50 -34z"/></g></g>`:
+  `<g class="bob2" id="tgt"><rect x="600" y="182" width="76" height="40" rx="6" fill="url(#chestG)" stroke="#3b210b" stroke-width="4"/>
+   <path d="M600 186 q38 -34 76 0 z" fill="#8a5424" stroke="#3b210b" stroke-width="4"/><rect x="632" y="192" width="12" height="16" rx="2" fill="#ffcb3d" stroke="#8a5300" stroke-width="2"/>
+   <path d="M600 200 h76" stroke="#ffcb3d" stroke-width="3"/></g>`;
+  $('hp').hidden=!isK;$('hearts').hidden=!isK;updateBoss()}
+function updateBoss(){$('hpFill').style.width=(bossHp/10*100)+'%';$('hearts').textContent='❤️'.repeat(hearts)+'🖤'.repeat(3-hearts)}
+
+// пушка
+function fire(hit,done){const svg=$('balls');const ns='http://www.w3.org/2000/svg';const b=document.createElementNS(ns,'circle');b.setAttribute('r','9');b.setAttribute('fill','#1d1d1d');svg.append(b);
+  const x0=275,y0=200,x1=hit?640:560+R(-20,40),y1=hit?190:250;const flash=document.createElementNS(ns,'circle');flash.setAttribute('cx',x0+8);flash.setAttribute('cy',y0);flash.setAttribute('r','16');flash.setAttribute('fill','#ffb347');svg.append(flash);setTimeout(()=>flash.remove(),120);
+  sBoom();const t0=performance.now(),T=650;function step(t){const k=Math.min(1,(t-t0)/T);const x=x0+(x1-x0)*k,y=y0+(y1-y0)*k-Math.sin(Math.PI*k)*120;b.setAttribute('cx',x);b.setAttribute('cy',y);if(k<1)requestAnimationFrame(step);else{b.remove();impact(hit,x1,y1);done()}}requestAnimationFrame(step)}
+function toScreen(x,y){const r=$('sceneSvg').getBoundingClientRect();return [r.left+x/800*r.width,r.top+y/300*r.height]}
+function impact(hit,x,y){const [sx,sy]=toScreen(x,y);if(hit){burst(sx,sy,40,['#ffcb3d','#fff1a8','#ff9f1c','#ffffff']);const t=$('tgt');t.classList.remove('hit');void t.getBBox();t.classList.add('hit');sCoin()}else{burst(sx,sy,24,['#bfefff','#7fd3e6','#ffffff']);sSplash()}}
+
+// звук
+let ac=null,muted=false;function audio(){try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state!=='running')ac.resume()}catch(e){}}
+addEventListener('pointerdown',audio);addEventListener('keydown',audio);
+function tone(f,d,type='triangle',v=.25,delay=0){if(!ac||muted)return;const t0=ac.currentTime+delay;const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(f,t0);g.gain.setValueAtTime(v,t0);g.gain.exponentialRampToValueAtTime(.001,t0+d);o.connect(g).connect(ac.destination);o.start(t0);o.stop(t0+d)}
+function noise(d,v=.4,lp=800){if(!ac||muted)return;const b=ac.createBuffer(1,ac.sampleRate*d,ac.sampleRate),c=b.getChannelData(0);for(let i=0;i<c.length;i++)c[i]=(Math.random()*2-1)*(1-i/c.length);const s=ac.createBufferSource();s.buffer=b;const f=ac.createBiquadFilter();f.type='lowpass';f.frequency.value=lp;const g=ac.createGain();g.gain.value=v;s.connect(f).connect(g).connect(ac.destination);s.start()}
+const sBoom=()=>{noise(.35,.6,500);tone(90,.25,'sine',.35)};
+const sCoin=()=>{tone(988,.12);tone(1319,.25,'triangle',.22,.08)};
+const sSplash=()=>noise(.5,.35,2200);
+const sBad=()=>{tone(200,.25,'sawtooth',.12);tone(150,.3,'sawtooth',.1,.1)};
+const sWin=()=>[523,659,784,1047].forEach((f,i)=>tone(f,.4,'triangle',.22,i*.13));
+
+// частицы
+const fx=$('fx'),fctx=fx.getContext('2d');let parts=[],loopOn=false;
+function sizeFx(){fx.width=innerWidth*devicePixelRatio;fx.height=innerHeight*devicePixelRatio}
+function burst(x,y,n,colors){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=2+Math.random()*6;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-3,life:1,r:3+Math.random()*4,c:colors[i%colors.length],round:Math.random()<.5})}if(!loopOn)loop()}
+function loop(){loopOn=true;const d=devicePixelRatio;fctx.clearRect(0,0,fx.width,fx.height);parts=parts.filter(p=>p.life>0);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.22;p.life-=.018;fctx.globalAlpha=Math.max(0,p.life);fctx.fillStyle=p.c;fctx.beginPath();if(p.round)fctx.arc(p.x*d,p.y*d,p.r*d,0,7);else fctx.rect(p.x*d,p.y*d,p.r*d,p.r*d*.6);fctx.fill()});fctx.globalAlpha=1;if(parts.length)requestAnimationFrame(loop);else loopOn=false}
+function confetti(){for(let i=0;i<6;i++)setTimeout(()=>burst(innerWidth*(.15+Math.random()*.7),innerHeight*(.2+Math.random()*.3),40,['#ffcb3d','#5fe3a1','#7fd3e6','#ff8a5c','#fff']),i*140)}
+
+// игра
+function newTask(){task=GEN[LEVELS[lv].gen]();stage='main';input='';hintShown=false;cur={kind:task.kind,q:task.q||task.t,a:task.a,first:null,hint:false,tries:0};drawCard();drawScreen()}
+function drawCard(){const L=LEVELS[lv],c=$('card');c.replaceChildren();
+  const pr=el('div','prog');for(let i=0;i<L.n;i++)pr.append(el('i',i<ti?'on':i===ti?'cur':''));c.append(pr);
+  c.append(el('div','tag',L.sea+' · '+(ti+1)+' из '+L.n));
+  if(stage==='check'){const [q,d,n]=task.check;c.append(el('div','check','Ответ '+q+' верный! Теперь проверка умножением:'));c.append(el('p','q',q+' · '+d+' = ?'))}
+  else if(task.t)c.append(el('p','q text',task.t));else c.append(el('p','q',task.q+' = ?'));
+  const m=el('div','msg');m.id='msg';c.append(m);
+  const h=el('div','hint',stage==='check'?'Умножь '+task.check[0]+' на '+task.check[1]+'. Должно получиться число, которое делили.':task.hint);h.id='hint';h.hidden=!hintShown;c.append(h);
+  $('hintBtn').disabled=hintShown}
+function drawScreen(){const s=$('screen');s.textContent=input||'?';s.classList.toggle('empty',!input)}
+function press(k){if(busy)return;if(k==='del'){input=input.slice(0,-1)}else if(k==='fire'){submit();return}else if(input.length<5){input=(input==='0'?'':input)+k}drawScreen()}
+function submit(){if(!input||busy)return;const v=+input;
+  if(stage==='check'){const want=task.check[2];if(v===want){busy=true;msg('ok','Проверка сошлась! Клад поделён честно.');fire(true,()=>{reward();busy=false;advance()})}else{msg('bad','Проверка не сошлась. Умножь ещё раз.');shakeScreen();sBad();input='';drawScreen()}return}
+  cur.tries++;if(v===task.a){if(cur.first===null)cur.first=cur.tries===1;busy=true;msg('ok',pickOne(['Бабах! Прямо в цель!','Точный выстрел!','Йо-хо-хо, попал!','Клад наш!']));
+    fire(true,()=>{reward();busy=false;if(lv===4){bossHp--;updateBoss()}if(task.check){stage='check';input='';hintShown=false;drawCard();drawScreen()}else advance()})}
+  else{if(cur.first===null)cur.first=false;busy=true;msg('bad',input+' — мимо! Пересчитай.');fire(false,()=>{busy=false;shakeScreen();sBad();if(lv===4){hearts--;updateBoss();const sh=$('ship');sh.classList.remove('hit');void sh.getBBox();sh.classList.add('hit');if(hearts<=0){lose();return}}input='';drawScreen();if(cur.tries>=2&&!hintShown){showHint()}})}}
+function msg(c,t){const m=$('msg');if(m){m.className='msg '+c;m.textContent=t}}
+function shakeScreen(){const s=$('screen');s.classList.remove('shake');void s.offsetWidth;s.classList.add('shake')}
+function showHint(){hintShown=true;if(cur)cur.hint=true;const h=$('hint');if(h)h.hidden=false;$('hintBtn').disabled=true;report()}
+function reward(){coins+=lv===4?2:1;$('coins').textContent=coins;const p=$('coinsPill');p.classList.remove('bump');void p.offsetWidth;p.classList.add('bump')}
+function advance(){log[lv].push(cur);report();ti++;if(lv===4&&bossHp<=0){levelDone(true);return}if(ti>=LEVELS[lv].n&&lv!==4){levelDone(false);return}newTask()}
+const starsOf=i=>{const l=log[i];if(!l.length)return 0;const r=l.filter(x=>x.first).length/l.length;return r>=.9?3:r>=.6?2:1};
+function modal(title,big,body,buttons){const ov=el('div','overlay');const m=el('div','modal');m.append(el('div','big',big),el('h2',null,title));if(body)m.append(body);const row=el('div','row');row.style.justifyContent='center';buttons.forEach(([t,cls,fn])=>{const b=el('button','btn '+cls,t);b.type='button';b.onclick=()=>{ov.remove();fn()};row.append(b)});m.append(row);ov.append(m);document.body.append(ov);row.querySelector('button').focus()}
+function levelDone(boss){drawLevels();sWin();confetti();const n=starsOf(lv);const st=el('div','bigstars');for(let i=0;i<3;i++){const s=el('span',i<n?'':'off','★');st.append(s)}
+  const box=el('div');box.style.cssText='display:flex;flex-direction:column;gap:8px;align-items:center';box.append(st,el('p',null,'С первого выстрела: '+log[lv].filter(x=>x.first).length+' из '+log[lv].length+'. Монет: '+coins+'.'));
+  if(boss)modal('Кракен побеждён!','🐙',box,[['Сыграть ещё','main',()=>go(4,true)]]);
+  else modal('Море пройдено!','💰',box,[['Дальше: '+LEVELS[lv+1].name,'main',()=>go(lv+1)],['Ещё раз','',()=>go(lv,true)]])}
+function lose(){modal('Кракен утащил корабль…','🌊',el('p',null,'Ничего, пираты не сдаются. Попробуй ещё раз!'),[['Снова в бой','main',()=>go(4,true)]])}
+function go(n,reset){lv=n;ti=0;if(reset||lv===4)log[lv]=[];hearts=3;bossHp=10;drawTarget();drawLevels();newTask();report()}
+function drawLevels(){const nav=$('levels');nav.replaceChildren();LEVELS.forEach((L,i)=>{const b=el('button','lv');b.type='button';b.append(el('b',null,String(i+1)),document.createTextNode(L.name));const n=starsOf(i);if(log[i].length&&(i===4||log[i].length>=L.n))b.append(el('span','stars','★'.repeat(n)+'☆'.repeat(3-n)));b.setAttribute('aria-current',String(i===lv));b.onclick=()=>go(i);nav.append(b)})}
+function report(){const box=$('report');box.replaceChildren();const kinds=['Таблица','Умножение','Деление','Задачи'];const all=log.flat();
+  const tb=el('table');const h=el('tr');['Тема','С первого раза','С подсказкой','Вывод'].forEach(x=>h.append(el('th',null,x)));tb.append(h);
+  kinds.forEach(k=>{const l=all.filter(x=>x.kind===k);const f=l.filter(x=>x.first).length,hi=l.filter(x=>x.hint).length;let v='—',cls='';if(l.length){const r=f/l.length;if(r>=.8){v='уверенно';cls='st-ok'}else if(r>=.5){v='с подсказкой';cls='st-mid'}else{v='нужно учить';cls='st-bad'}}
+    const tr=el('tr');tr.append(el('td',null,k),el('td',null,l.length?f+' из '+l.length:'—'),el('td',null,l.length?String(hi):'—'),el('td',cls,v));tb.append(tr)});box.append(tb);
+  const miss=all.filter(x=>x.first===false).map(x=>(x.q.length>45?x.q.slice(0,45)+'…':x.q)+' → '+x.a);if(miss.length)box.append(el('p','how','Ошибался в: '+miss.join('; ')))}
+
+// клавиатура
+const pad=$('pad');['7','8','9','4','5','6','1','2','3','del','0','fire'].forEach(k=>{const b=el('button','key'+(k==='del'?' del':k==='fire'?' fire':''),k==='del'?'⌫':k==='fire'?'Огонь! 💥':k);b.type='button';b.dataset.k=k;b.setAttribute('aria-label',k==='del'?'Стереть':k==='fire'?'Огонь':k);b.onclick=()=>press(k);pad.append(b)});
+addEventListener('keydown',e=>{if($('start')||document.querySelector('.overlay'))return;let k=null;if(/^[0-9]$/.test(e.key))k=e.key;else if(e.key==='Backspace')k='del';else if(e.key==='Enter')k='fire';if(k){e.preventDefault();press(k);const b=pad.querySelector('[data-k="'+k+'"]');if(b){b.classList.add('press');setTimeout(()=>b.classList.remove('press'),100)}}});
+$('hintBtn').onclick=showHint;
+$('mute').onclick=()=>{muted=!muted;$('mute').textContent=muted?'🔇':'🔊';$('mute').setAttribute('aria-label',muted?'Включить звук':'Выключить звук');if(!muted)sCoin()};
+addEventListener('resize',sizeFx);sizeFx();
+go(0);
+$('playBtn').onclick=()=>{audio();$('start').remove();sCoin();const [x,y]=toScreen(640,190);burst(x,y,40,['#ffcb3d','#fff1a8','#ff9f1c'])};
+$('playBtn').focus();
+})();
+</script>
+</body>
+</html>
