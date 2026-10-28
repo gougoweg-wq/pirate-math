@@ -48,6 +48,23 @@ header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-betw
 .bob2{animation:bob 3.6s ease-in-out infinite reverse;transform-box:fill-box;transform-origin:50% 100%}
 .hit{animation:hit .5s}
 @keyframes hit{20%{transform:translateX(10px) rotate(4deg)}50%{transform:translateX(-8px) rotate(-3deg)}}
+.cloud{animation:drift 40s linear infinite}.cloud.c2{animation-duration:55s}.cloud.c3{animation-duration:70s}
+@keyframes drift{from{transform:translateX(-60px)}to{transform:translateX(60px)}}
+.rays{animation:spin 30s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.gulls{animation:fly 22s linear infinite}@keyframes fly{from{transform:translateX(-380px)}to{transform:translateX(560px)}}
+.gull{animation:flap .6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}.gull.g2{animation-duration:.5s}
+@keyframes flap{to{transform:scaleY(.4)}}
+.palm{animation:sway 4s ease-in-out infinite}@keyframes sway{50%{transform:rotate(4deg)}}
+.flag{animation:flagw .8s ease-in-out infinite alternate}@keyframes flagw{to{transform:skewY(6deg) scaleX(.92)}}
+.wave.w3{animation:wave 7s ease-in-out infinite}
+.sparkles circle{animation:twinkle 2s ease-in-out infinite}.sparkles circle:nth-child(2n){animation-delay:1s}
+@keyframes twinkle{50%{opacity:0}}
+.tent{transform-box:fill-box;animation:tent 2.2s ease-in-out infinite}.tent.t2{animation-delay:.4s}.tent.t3{animation-delay:.8s}.tent.t4{animation-delay:1.2s}
+.tent.L{transform-origin:100% 100%}.tent.Rr{transform-origin:0% 100%}
+@keyframes tent{50%{transform:rotate(10deg)}}
+.flashHit{animation:flashHit .35s}@keyframes flashHit{30%{filter:brightness(2.2) saturate(.3)}}
+.lid{transform-box:fill-box;transform-origin:0% 100%;transition:transform .25s}.lid.open{transform:rotate(-38deg)}
+.shake{animation:sshake .35s}@keyframes sshake{25%{transform:translate(-6px,3px)}50%{transform:translate(5px,-3px)}75%{transform:translate(-3px,2px)}}
 .hpbar{position:absolute;right:14px;top:12px;width:min(260px,45%);background:rgba(0,0,0,.45);border-radius:12px;padding:6px 8px;display:flex;flex-direction:column;gap:4px}
 .hpbar span{font:900 12px var(--f-body);letter-spacing:.1em;text-transform:uppercase}
 .hpbar .bar{height:10px;border-radius:9px;background:rgba(255,255,255,.18);overflow:hidden}
@@ -119,30 +136,55 @@ th{color:var(--muted);font-size:13px;border-top:0}
   <div class="scene" id="scene">
     <svg viewBox="0 0 800 300" id="sceneSvg" aria-hidden="true">
       <defs>
-        <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b8aa6"/><stop offset="1" stop-color="#0a4257"/></linearGradient>
-        <linearGradient id="sail" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff8e8"/><stop offset="1" stop-color="#e8d6b0"/></linearGradient>
-        <radialGradient id="sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6c8"/><stop offset="1" stop-color="#ffd45c"/></radialGradient>
-        <linearGradient id="chestG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5652c"/><stop offset="1" stop-color="#5b3412"/></linearGradient>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3fb2d6"/><stop offset=".6" stop-color="#9fe0ee"/><stop offset="1" stop-color="#d9f5f8"/></linearGradient>
+        <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b9bb8"/><stop offset="1" stop-color="#073a4f"/></linearGradient>
+        <linearGradient id="sail" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fffaf0"/><stop offset=".7" stop-color="#f1e2c0"/><stop offset="1" stop-color="#d7bf8e"/></linearGradient>
+        <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a5e2c"/><stop offset="1" stop-color="#4d2a0e"/></linearGradient>
+        <radialGradient id="sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fffbe0"/><stop offset=".6" stop-color="#ffe17a"/><stop offset="1" stop-color="#ffc53d"/></radialGradient>
+        <radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6c0" stop-opacity=".8"/><stop offset="1" stop-color="#fff6c0" stop-opacity="0"/></radialGradient>
+        <linearGradient id="chestG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b36f33"/><stop offset="1" stop-color="#5b3412"/></linearGradient>
+        <radialGradient id="krakG" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#b886ee"/><stop offset="1" stop-color="#6a33ad"/></radialGradient>
+        <radialGradient id="coinG" cx=".35" cy=".3" r=".7"><stop offset="0" stop-color="#fff3b0"/><stop offset=".5" stop-color="#ffcb3d"/><stop offset="1" stop-color="#c47e08"/></radialGradient>
       </defs>
-      <circle cx="660" cy="62" r="34" fill="url(#sun)"/>
-      <g fill="#fff" opacity=".85"><ellipse cx="180" cy="55" rx="46" ry="14"/><ellipse cx="215" cy="46" rx="30" ry="14"/><ellipse cx="470" cy="80" rx="38" ry="11"/><ellipse cx="500" cy="72" rx="24" ry="11"/></g>
-      <!-- остров с целью -->
-      <g id="island"><ellipse cx="640" cy="222" rx="120" ry="24" fill="#e9c98a"/><path d="M600 214 C602 170 610 150 630 128" stroke="#7a4a22" stroke-width="7" fill="none"/><g fill="#2f9b55"><path d="M630 128 c-30 -6 -50 4 -60 16 c18 -6 36 -6 60 -16z"/><path d="M630 128 c10 -24 30 -32 52 -30 c-18 8 -34 18 -52 30z"/><path d="M630 128 c26 -2 44 10 50 24 c-16 -10 -32 -16 -50 -24z"/><path d="M630 128 c-14 -20 -36 -26 -56 -20 c20 4 38 10 56 20z"/></g></g>
+      <rect width="800" height="220" fill="url(#sky)"/>
+      <circle cx="660" cy="64" r="80" fill="url(#glow)"/>
+      <g class="rays" style="transform-origin:660px 64px"><g stroke="#fff2b0" stroke-width="5" stroke-linecap="round" opacity=".55"><path d="M660 4v14M660 110v14M600 64h14M706 64h14M618 22l10 10M692 96l10 10M618 106l10-10M692 32l10-10"/></g></g>
+      <circle cx="660" cy="64" r="32" fill="url(#sun)"/>
+      <g class="cloud c1" fill="#fff"><ellipse cx="160" cy="58" rx="48" ry="15"/><ellipse cx="195" cy="48" rx="30" ry="16"/><ellipse cx="135" cy="50" rx="22" ry="12"/></g>
+      <g class="cloud c2" fill="#fff" opacity=".85"><ellipse cx="470" cy="86" rx="38" ry="11"/><ellipse cx="497" cy="78" rx="24" ry="12"/></g>
+      <g class="cloud c3" fill="#fff" opacity=".7"><ellipse cx="320" cy="30" rx="30" ry="9"/><ellipse cx="340" cy="24" rx="18" ry="9"/></g>
+      <g class="gulls" fill="none" stroke="#2c4a5a" stroke-width="2.5" stroke-linecap="round"><path class="gull" d="M300 70 q7 -7 14 0 q7 -7 14 0"/><path class="gull g2" d="M340 92 q5 -5 10 0 q5 -5 10 0"/></g>
+      <path d="M0 214 q60 -30 130 -6 q40 -18 80 2 L210 216 L0 216z" fill="#5fa7b8" opacity=".55"/>
+      <path d="M380 216 q50 -22 100 -4 q30 -10 60 4z" fill="#5fa7b8" opacity=".45"/>
+      <g id="island"><ellipse cx="640" cy="224" rx="124" ry="25" fill="#e9c98a"/><ellipse cx="640" cy="218" rx="104" ry="15" fill="#f6dca5"/>
+        <path d="M598 216 C600 172 610 150 632 128" stroke="#6b3f1c" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <g class="palm" style="transform-origin:632px 128px" fill="#2f9b55" stroke="#1d6b39" stroke-width="2"><path d="M632 128 c-32 -6 -52 4 -62 18 c20 -8 38 -8 62 -18z"/><path d="M632 128 c10 -26 32 -34 54 -32 c-18 8 -36 18 -54 32z"/><path d="M632 128 c28 -2 46 10 52 26 c-16 -10 -34 -18 -52 -26z"/><path d="M632 128 c-14 -22 -38 -28 -58 -22 c20 4 40 10 58 22z"/></g>
+        <circle cx="628" cy="132" r="5" fill="#7a4a22"/><circle cx="637" cy="134" r="5" fill="#7a4a22"/></g>
       <g id="target"></g>
-      <rect y="210" width="800" height="90" fill="url(#sea)"/>
-      <path class="wave" d="M-40 214 q20 -10 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 v90 h-920z" fill="#1f97b4" opacity=".7"/>
-      <!-- корабль -->
-      <g id="ship" class="bob">
-        <path d="M70 200 L250 200 L232 238 Q160 250 92 238 Z" fill="#7a4a22" stroke="#3b210b" stroke-width="4" stroke-linejoin="round"/>
-        <path d="M80 214 L242 214" stroke="#a8692f" stroke-width="5"/>
-        <circle cx="120" cy="224" r="5" fill="#2a1606"/><circle cx="160" cy="226" r="5" fill="#2a1606"/><circle cx="200" cy="224" r="5" fill="#2a1606"/>
-        <rect x="248" y="206" width="26" height="9" rx="3" fill="#2b2b2b" transform="rotate(-12 248 210)"/>
-        <rect x="156" y="70" width="7" height="132" fill="#4a2a10"/>
-        <path d="M163 82 Q215 110 163 160 Z" fill="url(#sail)" stroke="#bfa56f" stroke-width="2"/>
-        <path d="M156 92 Q108 124 156 168 Z" fill="url(#sail)" stroke="#bfa56f" stroke-width="2"/>
-        <path d="M163 70 L195 78 L163 88 Z" fill="#1d1d1d"/><text x="171" y="84" font-size="9" fill="#fff">☠</text>
-      </g>
-      <path class="wave w2" d="M-40 236 q25 -9 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 v70 h-930z" fill="#0d6c86" opacity=".85"/>
+      <rect y="212" width="800" height="88" fill="url(#sea)"/>
+      <g class="wave"><path d="M-60 214 q20 -9 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 v90 h-960z" fill="#2aa7c4" opacity=".8"/><path d="M-60 214 q20 -9 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" fill="none" stroke="#e8fbff" stroke-width="2.5" opacity=".7"/></g>
+      <g id="shipWrap"><g id="ship" class="bob">
+        <path d="M60 206 Q150 214 240 206 L222 244 Q150 256 80 244 Z" fill="url(#hull)" stroke="#2e1806" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M210 196 L262 196 L250 212 L206 212 Z" fill="url(#hull)" stroke="#2e1806" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M70 218 Q150 226 232 218" stroke="#c48a4c" stroke-width="3" fill="none"/><path d="M76 232 Q150 240 226 232" stroke="#3e2108" stroke-width="2" fill="none" opacity=".6"/>
+        <g fill="#1e1006" stroke="#c48a4c" stroke-width="2"><circle cx="105" cy="226" r="6"/><circle cx="140" cy="229" r="6"/><circle cx="175" cy="229" r="6"/><circle cx="208" cy="226" r="6"/></g>
+        <path d="M240 206 L292 190" stroke="#4a2a10" stroke-width="5" stroke-linecap="round"/>
+        <g id="cannon"><rect x="250" y="198" width="34" height="12" rx="5" fill="#2b2b2b" stroke="#111" stroke-width="2" transform="rotate(-14 250 204)"/><circle cx="252" cy="208" r="7" fill="#5b3a1a" stroke="#2e1806" stroke-width="2"/></g>
+        <rect x="118" y="60" width="7" height="148" rx="2" fill="#4a2a10"/><rect x="186" y="84" width="6" height="124" rx="2" fill="#4a2a10"/>
+        <rect x="111" y="78" width="21" height="10" rx="2" fill="#6b3f1c" stroke="#2e1806" stroke-width="2"/>
+        <g class="sails">
+          <path d="M125 92 Q168 118 125 166 Z" fill="url(#sail)" stroke="#b49a65" stroke-width="2"/>
+          <path d="M118 100 Q78 128 118 170 Z" fill="url(#sail)" stroke="#b49a65" stroke-width="2"/>
+          <path d="M192 104 Q226 128 192 168 Z" fill="url(#sail)" stroke="#b49a65" stroke-width="2"/>
+          <path d="M140 112 Q146 132 134 152" stroke="#c43c2c" stroke-width="5" fill="none" opacity=".8"/><path d="M204 118 Q209 134 200 152" stroke="#c43c2c" stroke-width="4" fill="none" opacity=".8"/>
+        </g>
+        <g stroke="#3b2410" stroke-width="1.2" opacity=".7"><path d="M121 62 L62 206"/><path d="M121 62 L262 196"/><path d="M189 86 L240 206"/></g>
+        <path class="flag" d="M125 60 Q140 54 158 62 Q170 66 160 76 Q142 70 125 76 Z" fill="#1d1d1d" style="transform-origin:125px 66px"/>
+        <text x="134" y="72" font-size="10" fill="#fff">☠</text>
+      </g></g>
+      <g class="wave w2"><path d="M-60 238 q25 -9 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 v70 h-950z" fill="#0f7893" opacity=".9"/><path d="M-60 238 q25 -9 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0" fill="none" stroke="#bff3ff" stroke-width="2" opacity=".5"/></g>
+      <g class="wave w3"><path d="M-60 264 q30 -8 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 v50 h-960z" fill="#09566d"/></g>
+      <g class="sparkles" fill="#fff"><circle cx="330" cy="250" r="2"/><circle cx="470" cy="272" r="1.6"/><circle cx="560" cy="246" r="1.8"/><circle cx="720" cy="268" r="2"/><circle cx="60" cy="276" r="1.6"/></g>
       <g id="balls"></g>
     </svg>
     <div class="hearts" id="hearts" hidden></div>
@@ -209,22 +251,50 @@ let cur=null;
 // цель на острове
 function drawTarget(){const g=$('target');const isK=LEVELS[lv].target==='kraken';$('island').style.display=isK?'none':'';
   g.innerHTML=isK?
-  `<g class="bob2" id="tgt"><path d="M560 230 q-30 -40 -10 -80 q20 -40 70 -40 q50 0 70 40 q20 40 -10 80 z" fill="#8b4fc9" stroke="#4b2178" stroke-width="5"/>
-   <circle cx="600" cy="170" r="16" fill="#fff"/><circle cx="660" cy="170" r="16" fill="#fff"/><circle cx="604" cy="174" r="8" fill="#1a0b2b"/><circle cx="656" cy="174" r="8" fill="#1a0b2b"/>
-   <path d="M610 205 q20 12 40 0" stroke="#4b2178" stroke-width="5" fill="none" stroke-linecap="round"/>
-   <g fill="#9d60dc" stroke="#4b2178" stroke-width="4"><path d="M540 236 q-40 -10 -60 -50 q30 30 66 34z"/><path d="M720 236 q40 -10 60 -50 q-30 30 -66 34z"/><path d="M575 240 q-20 30 -60 30 q40 -14 50 -34z"/><path d="M685 240 q20 30 60 30 q-40 -14 -50 -34z"/></g></g>`:
-  `<g class="bob2" id="tgt"><rect x="600" y="182" width="76" height="40" rx="6" fill="url(#chestG)" stroke="#3b210b" stroke-width="4"/>
-   <path d="M600 186 q38 -34 76 0 z" fill="#8a5424" stroke="#3b210b" stroke-width="4"/><rect x="632" y="192" width="12" height="16" rx="2" fill="#ffcb3d" stroke="#8a5300" stroke-width="2"/>
-   <path d="M600 200 h76" stroke="#ffcb3d" stroke-width="3"/></g>`;
+  `<g class="bob2" id="tgt">
+    <g fill="url(#krakG)" stroke="#3f1a6b" stroke-width="4" stroke-linecap="round">
+      <path class="tent L" d="M560 236 q-46 -6 -70 -52 q-6 -14 6 -12 q20 34 66 44z"/>
+      <path class="tent L t3" d="M574 242 q-26 34 -74 34 q-10 -2 0 -10 q40 -4 62 -34z"/>
+      <path class="tent Rr t2" d="M720 236 q46 -6 70 -52 q6 -14 -6 -12 q-20 34 -66 44z"/>
+      <path class="tent Rr t4" d="M706 242 q26 34 74 34 q10 -2 0 -10 q-40 -4 -62 -34z"/>
+    </g>
+    <path d="M556 232 q-34 -46 -12 -92 q22 -44 96 -44 q74 0 96 44 q22 46 -12 92 z" fill="url(#krakG)" stroke="#3f1a6b" stroke-width="5"/>
+    <g fill="#c79bf5" opacity=".7"><circle cx="600" cy="130" r="7"/><circle cx="680" cy="122" r="5"/><circle cx="700" cy="150" r="6"/><circle cx="580" cy="160" r="4"/></g>
+    <circle cx="610" cy="172" r="18" fill="#fff" stroke="#3f1a6b" stroke-width="3"/><circle cx="670" cy="172" r="18" fill="#fff" stroke="#3f1a6b" stroke-width="3"/>
+    <circle cx="615" cy="176" r="9" fill="#1a0b2b"/><circle cx="665" cy="176" r="9" fill="#1a0b2b"/><circle cx="618" cy="172" r="3" fill="#fff"/><circle cx="668" cy="172" r="3" fill="#fff"/>
+    <path d="M592 148 l30 12 M688 148 l-30 12" stroke="#3f1a6b" stroke-width="6" stroke-linecap="round"/>
+    <path d="M612 210 q28 16 56 0" stroke="#3f1a6b" stroke-width="6" fill="#2a0d45" stroke-linecap="round"/>
+    <path d="M626 214 l5 8 l5 -7 M646 214 l5 8 l5 -7" fill="#fff"/>
+  </g>`:
+  `<g class="bob2" id="tgt">
+    <rect x="598" y="184" width="80" height="40" rx="6" fill="url(#chestG)" stroke="#3b210b" stroke-width="4"/>
+    <path d="M598 196 h80 M598 212 h80" stroke="#3b210b" stroke-width="2" opacity=".5"/>
+    <rect x="612" y="184" width="8" height="40" fill="#ffcb3d" stroke="#8a5300" stroke-width="2"/><rect x="656" y="184" width="8" height="40" fill="#ffcb3d" stroke="#8a5300" stroke-width="2"/>
+    <g class="lid" id="lid"><path d="M596 188 q42 -38 84 0 z" fill="#8a5424" stroke="#3b210b" stroke-width="4" stroke-linejoin="round"/><path d="M612 177 q0 -6 8 -10 M656 167 q8 4 8 10" stroke="#ffcb3d" stroke-width="5" fill="none"/></g>
+    <rect x="632" y="192" width="12" height="15" rx="2" fill="#ffcb3d" stroke="#8a5300" stroke-width="2"/><circle cx="638" cy="198" r="2" fill="#5a3300"/>
+    <g fill="url(#coinG)" stroke="#8a5300" stroke-width="1.5"><ellipse cx="582" cy="226" rx="8" ry="4"/><ellipse cx="692" cy="227" rx="8" ry="4"/><ellipse cx="700" cy="223" rx="8" ry="4"/></g>
+  </g>`;
   $('hp').hidden=!isK;$('hearts').hidden=!isK;updateBoss()}
 function updateBoss(){$('hpFill').style.width=(bossHp/10*100)+'%';$('hearts').textContent='❤️'.repeat(hearts)+'🖤'.repeat(3-hearts)}
 
 // пушка
-function fire(hit,done){const svg=$('balls');const ns='http://www.w3.org/2000/svg';const b=document.createElementNS(ns,'circle');b.setAttribute('r','9');b.setAttribute('fill','#1d1d1d');svg.append(b);
-  const x0=275,y0=200,x1=hit?640:560+R(-20,40),y1=hit?190:250;const flash=document.createElementNS(ns,'circle');flash.setAttribute('cx',x0+8);flash.setAttribute('cy',y0);flash.setAttribute('r','16');flash.setAttribute('fill','#ffb347');svg.append(flash);setTimeout(()=>flash.remove(),120);
-  sBoom();const t0=performance.now(),T=650;function step(t){const k=Math.min(1,(t-t0)/T);const x=x0+(x1-x0)*k,y=y0+(y1-y0)*k-Math.sin(Math.PI*k)*120;b.setAttribute('cx',x);b.setAttribute('cy',y);if(k<1)requestAnimationFrame(step);else{b.remove();impact(hit,x1,y1);done()}}requestAnimationFrame(step)}
+const NS='http://www.w3.org/2000/svg';
+function puff(x,y,n=5){const svg=$('balls');for(let i=0;i<n;i++){const c=document.createElementNS(NS,'circle');c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r',6);c.setAttribute('fill',i%2?'#e8e8e8':'#cfcfcf');svg.append(c);
+  const dx=R(-10,30),dy=R(-30,-6),rr=R(14,26);c.animate([{transform:'translate(0,0)',r:6,opacity:.95},{transform:`translate(${dx}px,${dy}px)`,r:rr,opacity:0}],{duration:R(600,900),easing:'ease-out'}).onfinish=()=>c.remove()}}
+function shakeScene(){const sc=$('scene');sc.classList.remove('shake');void sc.offsetWidth;sc.classList.add('shake')}
+function fire(hit,done){const svg=$('balls');const b=document.createElementNS(NS,'circle');b.setAttribute('r','9');b.setAttribute('fill','#1d1d1d');b.setAttribute('stroke','#555');b.setAttribute('stroke-width','2');svg.append(b);
+  const x0=290,y0=192,x1=hit?640:560+R(-20,40),y1=hit?196:252;
+  const flash=document.createElementNS(NS,'circle');flash.setAttribute('cx',x0);flash.setAttribute('cy',y0);flash.setAttribute('r','18');flash.setAttribute('fill','#ffb347');svg.append(flash);setTimeout(()=>flash.remove(),110);
+  puff(x0,y0,6);const sh=$('ship');sh.animate([{transform:'translateX(0)'},{transform:'translateX(-8px)'},{transform:'translateX(0)'}],{duration:260});
+  sBoom();shakeScene();const t0=performance.now(),T=650;
+  function step(t){const k=Math.min(1,(t-t0)/T);const x=x0+(x1-x0)*k,y=y0+(y1-y0)*k-Math.sin(Math.PI*k)*120;b.setAttribute('cx',x);b.setAttribute('cy',y);if(k<1)requestAnimationFrame(step);else{b.remove();impact(hit,x1,y1);done()}}requestAnimationFrame(step)}
 function toScreen(x,y){const r=$('sceneSvg').getBoundingClientRect();return [r.left+x/800*r.width,r.top+y/300*r.height]}
-function impact(hit,x,y){const [sx,sy]=toScreen(x,y);if(hit){burst(sx,sy,40,['#ffcb3d','#fff1a8','#ff9f1c','#ffffff']);const t=$('tgt');t.classList.remove('hit');void t.getBBox();t.classList.add('hit');sCoin()}else{burst(sx,sy,24,['#bfefff','#7fd3e6','#ffffff']);sSplash()}}
+function coinsFly(){const svg=$('balls');for(let i=0;i<7;i++){const c=document.createElementNS(NS,'ellipse');c.setAttribute('cx',638);c.setAttribute('cy',186);c.setAttribute('rx',8);c.setAttribute('ry',8);c.setAttribute('fill','url(#coinG)');c.setAttribute('stroke','#8a5300');c.setAttribute('stroke-width','1.5');svg.append(c);
+  const dx=R(-70,70),up=R(60,110);c.animate([{transform:'translate(0,0)'},{transform:`translate(${dx*.6}px,${-up}px)`,offset:.5},{transform:`translate(${dx}px,${-up*.4}px)`,opacity:0}],{duration:R(700,1000),easing:'ease-out'}).onfinish=()=>c.remove()}}
+function impact(hit,x,y){const [sx,sy]=toScreen(x,y);
+  if(hit){burst(sx,sy,40,['#ffcb3d','#fff1a8','#ff9f1c','#ffffff']);puff(x,y,4);const t=$('tgt');t.classList.remove('flashHit');void t.getBBox();t.classList.add('flashHit');
+    const lid=$('lid');if(lid){lid.classList.add('open');coinsFly();setTimeout(()=>lid.classList.remove('open'),700)}sCoin()}
+  else{burst(sx,sy,26,['#bfefff','#7fd3e6','#ffffff']);const svg=$('balls');const sp=document.createElementNS(NS,'path');sp.setAttribute('d',`M${x-18} ${y} q8 -34 18 -40 q10 6 18 40z`);sp.setAttribute('fill','#dff8ff');sp.setAttribute('opacity','.9');svg.append(sp);sp.animate([{transform:'scaleY(.2)',opacity:.9},{transform:'scaleY(1)',opacity:.9,offset:.4},{transform:'scaleY(.1)',opacity:0}],{duration:600}).onfinish=()=>sp.remove();sSplash()}}
 
 // звук
 let ac=null,muted=false;function audio(){try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state!=='running')ac.resume()}catch(e){}}
@@ -260,7 +330,7 @@ function submit(){if(!input||busy)return;const v=+input;
   if(stage==='check'){const want=task.check[2];if(v===want){busy=true;msg('ok','Проверка сошлась! Клад поделён честно.');fire(true,()=>{reward();busy=false;advance()})}else{msg('bad','Проверка не сошлась. Умножь ещё раз.');shakeScreen();sBad();input='';drawScreen()}return}
   cur.tries++;if(v===task.a){if(cur.first===null)cur.first=cur.tries===1;busy=true;msg('ok',pickOne(['Бабах! Прямо в цель!','Точный выстрел!','Йо-хо-хо, попал!','Клад наш!']));
     fire(true,()=>{reward();busy=false;if(lv===4){bossHp--;updateBoss()}if(task.check){stage='check';input='';hintShown=false;drawCard();drawScreen()}else advance()})}
-  else{if(cur.first===null)cur.first=false;busy=true;msg('bad',input+' — мимо! Пересчитай.');fire(false,()=>{busy=false;shakeScreen();sBad();if(lv===4){hearts--;updateBoss();const sh=$('ship');sh.classList.remove('hit');void sh.getBBox();sh.classList.add('hit');if(hearts<=0){lose();return}}input='';drawScreen();if(cur.tries>=2&&!hintShown){showHint()}})}}
+  else{if(cur.first===null)cur.first=false;busy=true;msg('bad',input+' — мимо! Пересчитай.');fire(false,()=>{busy=false;shakeScreen();sBad();if(lv===4){hearts--;updateBoss();const sh=$('shipWrap');sh.classList.remove('flashHit');void sh.getBBox();sh.classList.add('flashHit');shakeScene();if(hearts<=0){lose();return}}input='';drawScreen();if(cur.tries>=2&&!hintShown){showHint()}})}}
 function msg(c,t){const m=$('msg');if(m){m.className='msg '+c;m.textContent=t}}
 function shakeScreen(){const s=$('screen');s.classList.remove('shake');void s.offsetWidth;s.classList.add('shake')}
 function showHint(){hintShown=true;if(cur)cur.hint=true;const h=$('hint');if(h)h.hidden=false;$('hintBtn').disabled=true;report()}
